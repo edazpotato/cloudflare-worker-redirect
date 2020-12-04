@@ -58,9 +58,15 @@ async function handleRequest(request) {
   const url = new URL(request.url);
   const path = url.pathname.slice(1, url.pathname.length + 1);
 
-  // Search the list of redirect key-value pairs for a key
-  //  that matches the one we just extracted from the URL.
-  const redir = redirs.find((obj) => obj.key === path);
+  // Loop through the list of redirect key-value pairs to
+  //  try and find a key that matches the one we just
+  //  extracted from the URL.
+  let redir = null;
+  for (r of redirs) {
+    if (r.key === path) {
+      redir = r;
+    }
+  }
 
   if (redir) {
     // If we found a key that exists in the list of pairs,
@@ -70,9 +76,12 @@ async function handleRequest(request) {
     return new Response(
       JSON.stringify({
         status: "success",
-        message: `redirecting to ${redir.link}`,
+        message: `Redirecting to ${redir.link}.`,
       }),
-      { status: 308, headers: { location: redir.link } }
+      {
+        status: 308,
+        headers: { location: redir.link, "content-type": "application/json" },
+      }
     );
     // (The 308 status code means 'Permanent Redirect')
   } else {
@@ -81,9 +90,9 @@ async function handleRequest(request) {
     return new Response(
       JSON.stringify({
         status: "error",
-        message: "redirect not found",
+        message: "Redirect key not found.",
       }),
-      { status: 404 }
+      { status: 404, headers: { "content-type": "application/json" } }
     );
     // (The 404 status code means 'Not Found')
   }
