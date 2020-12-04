@@ -85,6 +85,6 @@ async function handleRequest(request) {
       }),
       { status: 404 }
     );
-    // (The 308 status code means 'Not Found')
+    // (The 404 status code means 'Not Found')
   }
 }
